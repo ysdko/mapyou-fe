@@ -15,7 +15,7 @@ export default function Sidebar({ selectedEvent, currentUser }) {
     formState: { errors },
   } = useForm({ defaultValues: { rating: 5, comment: "" } });
 
-  const eventId = selectedEvent?.id; // ← サイドバー対象イベントID
+  const eventId = selectedEvent?.id;
 
   // 一覧取得
   const fetchReviews = useMemo(
@@ -23,14 +23,10 @@ export default function Sidebar({ selectedEvent, currentUser }) {
       if (!eventId) return;
       setLoading(true);
       setErr("");
-      console.log(`Fetching reviews for event ${eventId}`);
       try {
         const res = await fetch(
           `${API_BASE}/reviews/${encodeURIComponent(eventId)}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
+          { method: "GET", credentials: "include" }
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
@@ -67,7 +63,7 @@ export default function Sidebar({ selectedEvent, currentUser }) {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          user_id: currentUser?.userId, // バックエンドの型に合わせて string/int を確認
+          user_id: currentUser?.userId,
           event_id: eventId,
           rating: parseInt(data.rating, 10),
           comment: data.comment,
@@ -77,7 +73,6 @@ export default function Sidebar({ selectedEvent, currentUser }) {
         const msg = await res.text();
         throw new Error(msg || `HTTP ${res.status}`);
       }
-      // 投稿成功 → フォーム初期化 & 一覧再取得
       reset({ rating: 5, comment: "" });
       await fetchReviews();
     } catch (e) {
@@ -86,13 +81,11 @@ export default function Sidebar({ selectedEvent, currentUser }) {
     }
   }
 
-  if (!currentUser) {
-    return <p className="text-gray-600">投稿にはログインが必要です。</p>;
-  }
-
   return (
     <div className="w-96 bg-white border-l p-4 h-screen overflow-y-auto shadow-xl">
-      <h2 className="text-xl font-bold mb-2">{selectedEvent?.title}</h2>
+      <h2 className="text-xl font-bold mb-2">
+        {selectedEvent?.title ?? "イベントを選択してください"}
+      </h2>
 
       {/* === イベント詳細 === */}
       <div className="mb-4 text-sm text-gray-700 space-y-1">
@@ -134,37 +127,41 @@ export default function Sidebar({ selectedEvent, currentUser }) {
       {err && <p className="text-red-600 mb-3">{err}</p>}
       {loading && <p className="text-gray-500">読み込み中...</p>}
 
-      {/* === 投稿フォーム === */}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <h3 className="text-lg font-semibold mb-2">口コミを投稿</h3>
+      {/* === 投稿フォーム / 未ログイン案内 === */}
+      {currentUser ? (
+        <form onSubmit={handleSubmit(onSubmit)} className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">口コミを投稿</h3>
 
-        <label className="block mb-1 text-sm font-medium">評価 (1〜5)</label>
-        <select
-          {...register("rating")}
-          className="w-full border rounded px-2 py-1 mb-3"
-        >
-          {[1, 2, 3, 4, 5].map((v) => (
-            <option key={v} value={v}>
-              {v}
-            </option>
-          ))}
-        </select>
+          <label className="block mb-1 text-sm font-medium">評価 (1〜5)</label>
+          <select
+            {...register("rating")}
+            className="w-full border rounded px-2 py-1 mb-3"
+          >
+            {[1, 2, 3, 4, 5].map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
 
-        <label className="block mb-1 text-sm font-medium">コメント</label>
-        <textarea
-          {...register("comment")}
-          className="w-full border rounded px-2 py-1 mb-3"
-          rows={3}
-          placeholder="感想を入力..."
-        />
+          <label className="block mb-1 text-sm font-medium">コメント</label>
+          <textarea
+            {...register("comment")}
+            className="w-full border rounded px-2 py-1 mb-3"
+            rows={3}
+            placeholder="感想を入力..."
+          />
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          投稿する
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+          >
+            投稿する
+          </button>
+        </form>
+      ) : (
+        <p className="text-red-500 mb-3">口コミ投稿にはログインが必要です。</p>
+      )}
 
       {/* === 口コミ一覧 === */}
       <div className="mb-4">
