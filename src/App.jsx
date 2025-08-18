@@ -19,6 +19,8 @@ const center = {
   lng: 139.7671,
 };
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
+
 const MyComponent = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ const MyComponent = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch("http://localhost:8080/events/today");
+        const res = await fetch(`${API_BASE}/events/today`);
         if (!res.ok) {
           throw new Error("Failed to fetch events");
         }
