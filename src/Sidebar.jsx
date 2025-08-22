@@ -113,7 +113,7 @@ export default function Sidebar({ selectedEvent, currentUser, onClose, isMobile 
       </button>
       
       {/* スクロール可能なコンテンツエリア */}
-      <div className={`${isMobile ? 'p-4 pt-8 max-h-[70vh] overflow-y-auto' : 'p-4 pt-12 h-full overflow-y-auto'}`}>
+      <div className={`${isMobile ? 'p-4 pt-8 max-h-[80vh] overflow-y-auto' : 'p-4 pt-12 h-full overflow-y-auto'}`}>
         {/* === イベント詳細 === */}
         <div className="mb-4 text-sm text-gray-700 space-y-1">
         {selectedEvent?.site_url && (
@@ -157,12 +157,12 @@ export default function Sidebar({ selectedEvent, currentUser, onClose, isMobile 
       {/* === 投稿フォーム / 未ログイン案内 === */}
       {currentUser ? (
         <form onSubmit={handleSubmit(onSubmit)} className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">口コミを投稿</h3>
+          <h3 className="text-lg font-semibold mb-2 text-gray-800">口コミを投稿</h3>
 
-          <label className="block mb-1 text-sm font-medium">評価 (1〜5)</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">評価 (1〜5)</label>
           <select
             {...register("rating")}
-            className="w-full border rounded px-2 py-1 mb-3"
+            className="w-full border border-gray-300 rounded px-2 py-1 mb-3 bg-white text-gray-800"
           >
             {[1, 2, 3, 4, 5].map((v) => (
               <option key={v} value={v}>
@@ -171,10 +171,10 @@ export default function Sidebar({ selectedEvent, currentUser, onClose, isMobile 
             ))}
           </select>
 
-          <label className="block mb-1 text-sm font-medium">コメント</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">コメント</label>
           <textarea
             {...register("comment")}
-            className="w-full border rounded px-2 py-1 mb-3"
+            className="w-full border border-gray-300 rounded px-2 py-1 mb-3 bg-white text-gray-800 placeholder-gray-500"
             rows={3}
             placeholder="感想を入力..."
           />
@@ -192,11 +192,11 @@ export default function Sidebar({ selectedEvent, currentUser, onClose, isMobile 
 
       {/* === 口コミ一覧 === */}
       <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-2">口コミ一覧</h3>
+        <h3 className="text-lg font-semibold mb-2 text-gray-800">口コミ一覧</h3>
         <div>
           {reviews.length > 0 ? (
             reviews.map((r) => (
-              <div key={r.id} className="mb-3 border-b pb-2">
+              <div key={r.id} className="mb-3 border-b border-gray-200 pb-2">
                 <div className="text-yellow-500 text-sm">
                   {"★".repeat(r.rating)}
                   {"☆".repeat(5 - r.rating)}

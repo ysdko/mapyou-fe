@@ -151,7 +151,7 @@ const MyComponent = () => {
           {/* スマホ用ボトムシート */}
           <div className="md:hidden fixed inset-x-0 bottom-0 z-10">
             {/* ボトムシート */}
-            <div className="relative w-full bg-white rounded-t-lg max-h-[80vh] animate-slide-up shadow-2xl">
+            <div className="relative w-full bg-white rounded-t-lg max-h-[90vh] animate-slide-up shadow-2xl">
               <Sidebar 
                 selectedEvent={selectedEvent} 
                 currentUser={username} 
