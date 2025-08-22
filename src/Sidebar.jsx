@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 
-export default function Sidebar({ selectedEvent, currentUser }) {
+export default function Sidebar({ selectedEvent, currentUser, onClose, isMobile = false }) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -82,18 +82,19 @@ export default function Sidebar({ selectedEvent, currentUser }) {
   }
 
   return (
-    <div className="w-96 bg-white border-l p-4 h-screen overflow-y-auto shadow-xl">
-      <h5
-        id="drawer-navigation-label"
-        className="text-base font-semibold text-gray-500 uppercase dark:text-gray-400"
-      >
-        Menu
-      </h5>
+    <div className={`${isMobile ? 'w-full h-auto max-h-full relative' : 'w-96 bg-white border-l h-screen shadow-xl relative'}`}>
+      {/* スマホ用ハンドルバー */}
+      {isMobile && (
+        <div className="flex justify-center mb-2 p-2">
+          <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
+        </div>
+      )}
       <button
         type="button"
+        onClick={onClose}
         data-drawer-hide="drawer-navigation"
         aria-controls="drawer-navigation"
-        className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 end-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        className={`text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute ${isMobile ? 'top-2 right-2' : 'top-2.5 end-2.5'} inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white z-10`}
       >
         <svg
           aria-hidden="true"
@@ -110,8 +111,11 @@ export default function Sidebar({ selectedEvent, currentUser }) {
         </svg>
         <span className="sr-only">Close menu</span>
       </button>
-      {/* === イベント詳細 === */}
-      <div className="mb-4 text-sm text-gray-700 space-y-1">
+      
+      {/* スクロール可能なコンテンツエリア */}
+      <div className={`${isMobile ? 'p-4 pt-8 max-h-[70vh] overflow-y-auto' : 'p-4 pt-12 h-full overflow-y-auto'}`}>
+        {/* === イベント詳細 === */}
+        <div className="mb-4 text-sm text-gray-700 space-y-1">
         {selectedEvent?.site_url && (
           <div>
             <span className="font-medium">公式サイト: </span>
@@ -189,19 +193,22 @@ export default function Sidebar({ selectedEvent, currentUser }) {
       {/* === 口コミ一覧 === */}
       <div className="mb-4">
         <h3 className="text-lg font-semibold mb-2">口コミ一覧</h3>
-        {reviews.length > 0 ? (
-          reviews.map((r) => (
-            <div key={r.id} className="mb-3 border-b pb-2">
-              <div className="text-yellow-500 text-sm">
-                {"★".repeat(r.rating)}
-                {"☆".repeat(5 - r.rating)}
+        <div>
+          {reviews.length > 0 ? (
+            reviews.map((r) => (
+              <div key={r.id} className="mb-3 border-b pb-2">
+                <div className="text-yellow-500 text-sm">
+                  {"★".repeat(r.rating)}
+                  {"☆".repeat(5 - r.rating)}
+                </div>
+                <p className="text-gray-700 text-sm mt-1">{r.comment}</p>
               </div>
-              <p className="text-gray-700 text-sm mt-1">{r.comment}</p>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500">口コミはまだありません。</p>
-        )}
+            ))
+          ) : (
+            <p className="text-gray-500">口コミはまだありません。</p>
+          )}
+        </div>
+      </div>
       </div>
     </div>
   );

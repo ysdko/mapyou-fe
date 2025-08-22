@@ -71,40 +71,99 @@ const MyComponent = () => {
   return (
     <div className="relative w-screen h-screen overflow-hidden">
       {/* ヘッダー */}
-      <header className="absolute top-0 left-0 right-0 bg-white shadow z-10 flex justify-between items-center px-6 py-3">
-        <div className="flex items-center space-x-2">
-          <img src="/mapyou-logo.png" alt="MAPYOU Logo" className="h-15 w-15" />
-          <h1 className="text-xl font-bold text-gray-800">MAPYOU</h1>
+      <header className="absolute top-0 left-0 right-0 bg-white shadow z-10">
+        {/* PC用ヘッダー */}
+        <div className="hidden md:flex justify-between items-center px-6 py-3">
+          <div className="flex items-center space-x-2">
+            <img src="/mapyou-logo.png" alt="MAPYOU Logo" className="h-15 w-15" />
+            <h1 className="text-xl font-bold text-gray-800">MAPYOU</h1>
+          </div>
+          {username ? (
+            <p>こんにちは, {username.username} さん</p>
+          ) : (
+            <p>ログインしていません</p>
+          )}
+          <div className="space-x-4">
+            <button
+              onClick={() => navigate("/signin")}
+              className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+            >
+              ログイン
+            </button>
+            <button
+              onClick={() => navigate("/signup")}
+              className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+            >
+              新規作成
+            </button>
+          </div>
         </div>
-        {username ? (
-          <p>こんにちは, {username.username} さん</p>
-        ) : (
-          <p>ログインしていません</p>
-        )}
-        <div className="space-x-4">
-          <button
-            onClick={() => navigate("/signin")}
-            className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            ログイン
-          </button>
-          <button
-            onClick={() => navigate("/signup")}
-            className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            新規作成
-          </button>
+        
+        {/* スマホ用ヘッダー */}
+        <div className="md:hidden px-4 py-2">
+          {/* 上段：ロゴ */}
+          <div className="flex items-center space-x-2 mb-1">
+            <img src="/mapyou-logo.png" alt="MAPYOU Logo" className="h-10 w-10" />
+            <h1 className="text-lg font-bold text-gray-800">MAPYOU</h1>
+          </div>
+          
+          {/* ユーザー情報 */}
+          <div className="mb-2">
+            {username ? (
+              <p className="text-sm text-gray-600">
+                こんにちは, {username.username}さん
+              </p>
+            ) : (
+              <p className="text-sm text-gray-600">未ログイン</p>
+            )}
+          </div>
+          
+          {/* 下段：ボタン */}
+          <div className="flex space-x-2">
+            <button
+              onClick={() => navigate("/signin")}
+              className="flex-1 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm py-2.5 px-3 text-center"
+            >
+              ログイン
+            </button>
+            <button
+              onClick={() => navigate("/signup")}
+              className="flex-1 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm py-2.5 px-3 text-center"
+            >
+              新規作成
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* サイドバー（選択時にスライド表示） */}
+      {/* サイドバー（PC: 左側、スマホ: 下からスライド） */}
       {selectedEvent && (
-        <div className="absolute top-0 left-0 h-full z-20">
-          <Sidebar selectedEvent={selectedEvent} currentUser={username} />
-        </div>
+        <>
+          {/* PC用サイドバー */}
+          <div className="hidden md:block absolute top-0 left-0 h-full z-20">
+            <Sidebar 
+              selectedEvent={selectedEvent} 
+              currentUser={username} 
+              onClose={() => setSelectedEvent(null)}
+            />
+          </div>
+          
+          {/* スマホ用ボトムシート */}
+          <div className="md:hidden fixed inset-x-0 bottom-0 z-10">
+            {/* ボトムシート */}
+            <div className="relative w-full bg-white rounded-t-lg max-h-[80vh] animate-slide-up shadow-2xl">
+              <Sidebar 
+                selectedEvent={selectedEvent} 
+                currentUser={username} 
+                onClose={() => setSelectedEvent(null)}
+                isMobile={true}
+              />
+            </div>
+          </div>
+        </>
       )}
 
-      <div className="flex pt-[60px] h-full">
+      <div className="flex pt-[80px] md:pt-[60px] h-full">
         <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={11}>
           {events.map((event) => (
             <Marker
