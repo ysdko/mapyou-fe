@@ -72,7 +72,10 @@ const MyComponent = () => {
     <div className="relative w-screen h-screen overflow-hidden">
       {/* ヘッダー */}
       <header className="absolute top-0 left-0 right-0 bg-white shadow z-10 flex justify-between items-center px-6 py-3">
-        <h1 className="text-xl font-bold text-gray-800">MAPYOU</h1>
+        <div className="flex items-center space-x-2">
+          <img src="/mapyou-logo.png" alt="MAPYOU Logo" className="h-15 w-15" />
+          <h1 className="text-xl font-bold text-gray-800">MAPYOU</h1>
+        </div>
         {username ? (
           <p>こんにちは, {username.username} さん</p>
         ) : (
