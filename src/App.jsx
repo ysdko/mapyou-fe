@@ -75,7 +75,11 @@ const MyComponent = () => {
         {/* PC用ヘッダー */}
         <div className="hidden md:flex justify-between items-center px-6 py-3">
           <div className="flex items-center space-x-2">
-            <img src="/mapyou-logo.png" alt="MAPYOU Logo" className="h-15 w-15" />
+            <img
+              src="/mapyou-logo.png"
+              alt="MAPYOU Logo"
+              className="h-15 w-15"
+            />
             <h1 className="text-xl font-bold text-gray-800">MAPYOU</h1>
           </div>
           {username ? (
@@ -98,15 +102,19 @@ const MyComponent = () => {
             </button>
           </div>
         </div>
-        
+
         {/* スマホ用ヘッダー */}
         <div className="md:hidden px-4 py-2">
           {/* 上段：ロゴ */}
           <div className="flex items-center space-x-2 mb-1">
-            <img src="/mapyou-logo.png" alt="MAPYOU Logo" className="h-10 w-10" />
+            <img
+              src="/mapyou-logo.png"
+              alt="MAPYOU Logo"
+              className="h-10 w-10"
+            />
             <h1 className="text-lg font-bold text-gray-800">MAPYOU</h1>
           </div>
-          
+
           {/* ユーザー情報 */}
           <div className="mb-2">
             {username ? (
@@ -117,7 +125,7 @@ const MyComponent = () => {
               <p className="text-sm text-gray-600">未ログイン</p>
             )}
           </div>
-          
+
           {/* 下段：ボタン */}
           <div className="flex space-x-2">
             <button
@@ -141,20 +149,20 @@ const MyComponent = () => {
         <>
           {/* PC用サイドバー */}
           <div className="hidden md:block absolute top-0 left-0 h-full z-20">
-            <Sidebar 
-              selectedEvent={selectedEvent} 
-              currentUser={username} 
+            <Sidebar
+              selectedEvent={selectedEvent}
+              currentUser={username}
               onClose={() => setSelectedEvent(null)}
             />
           </div>
-          
+
           {/* スマホ用ボトムシート */}
           <div className="md:hidden fixed inset-x-0 bottom-0 z-10">
             {/* ボトムシート */}
             <div className="relative w-full bg-white rounded-t-lg max-h-[90vh] animate-slide-up shadow-2xl">
-              <Sidebar 
-                selectedEvent={selectedEvent} 
-                currentUser={username} 
+              <Sidebar
+                selectedEvent={selectedEvent}
+                currentUser={username}
                 onClose={() => setSelectedEvent(null)}
                 isMobile={true}
               />

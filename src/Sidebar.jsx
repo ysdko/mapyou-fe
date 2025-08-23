@@ -1,7 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 
-export default function Sidebar({ selectedEvent, currentUser, onClose, isMobile = false }) {
+export default function Sidebar({
+  selectedEvent,
+  currentUser,
+  onClose,
+  isMobile = false,
+}) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -82,7 +87,13 @@ export default function Sidebar({ selectedEvent, currentUser, onClose, isMobile 
   }
 
   return (
-    <div className={`${isMobile ? 'w-full h-auto max-h-full relative' : 'w-96 bg-white border-l h-screen shadow-xl relative'}`}>
+    <div
+      className={`${
+        isMobile
+          ? "w-full h-auto max-h-full relative"
+          : "w-96 bg-white border-l h-screen shadow-xl relative"
+      }`}
+    >
       {/* スマホ用ハンドルバー */}
       {isMobile && (
         <div className="flex justify-center mb-2 p-2">
@@ -94,7 +105,9 @@ export default function Sidebar({ selectedEvent, currentUser, onClose, isMobile 
         onClick={onClose}
         data-drawer-hide="drawer-navigation"
         aria-controls="drawer-navigation"
-        className={`text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute ${isMobile ? 'top-2 right-2' : 'top-2.5 end-2.5'} inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white z-10`}
+        className={`text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute ${
+          isMobile ? "top-2 right-2" : "top-2.5 end-2.5"
+        } inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white z-10`}
       >
         <svg
           aria-hidden="true"
@@ -111,104 +124,127 @@ export default function Sidebar({ selectedEvent, currentUser, onClose, isMobile 
         </svg>
         <span className="sr-only">Close menu</span>
       </button>
-      
+
       {/* スクロール可能なコンテンツエリア */}
-      <div className={`${isMobile ? 'p-4 pt-8 max-h-[80vh] overflow-y-auto' : 'p-4 pt-12 h-full overflow-y-auto'}`}>
+      <div
+        className={`${
+          isMobile
+            ? "p-4 pt-8 max-h-[80vh] overflow-y-auto"
+            : "p-4 pt-12 h-full overflow-y-auto"
+        }`}
+      >
         {/* === イベント詳細 === */}
         <div className="mb-4 text-sm text-gray-700 space-y-1">
-        {selectedEvent?.site_url && (
-          <div>
-            <span className="font-medium">公式サイト: </span>
-            <a
-              href={selectedEvent.site_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 underline break-words"
-            >
-              {selectedEvent.site_url}
-            </a>
+          {/* イベント名 */}
+          <div className="mb-3">
+            <h2 className="text-lg font-bold text-gray-900">
+              {selectedEvent?.title}
+            </h2>
           </div>
-        )}
-        {selectedEvent?.category && (
-          <div>
-            <span className="font-medium">カテゴリー: </span>
-            {selectedEvent.category}
-          </div>
-        )}
-        {selectedEvent?.start_date && selectedEvent?.end_date && (
-          <div>
-            <span className="font-medium">開催期間: </span>
-            {new Date(selectedEvent.start_date).toLocaleDateString()} ～{" "}
-            {new Date(selectedEvent.end_date).toLocaleDateString()}
-          </div>
-        )}
-        {selectedEvent?.location && (
-          <div>
-            <span className="font-medium">開催場所: </span>
-            {selectedEvent.location}
-          </div>
-        )}
-      </div>
 
-      {/* 取得状態/エラー */}
-      {err && <p className="text-red-600 mb-3">{err}</p>}
-      {loading && <p className="text-gray-500">読み込み中...</p>}
-
-      {/* === 投稿フォーム / 未ログイン案内 === */}
-      {currentUser ? (
-        <form onSubmit={handleSubmit(onSubmit)} className="mb-6">
-          <h3 className="text-lg font-semibold mb-2 text-gray-800">口コミを投稿</h3>
-
-          <label className="block mb-1 text-sm font-medium text-gray-700">評価 (1〜5)</label>
-          <select
-            {...register("rating")}
-            className="w-full border border-gray-300 rounded px-2 py-1 mb-3 bg-white text-gray-800"
-          >
-            {[1, 2, 3, 4, 5].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
-
-          <label className="block mb-1 text-sm font-medium text-gray-700">コメント</label>
-          <textarea
-            {...register("comment")}
-            className="w-full border border-gray-300 rounded px-2 py-1 mb-3 bg-white text-gray-800 placeholder-gray-500"
-            rows={3}
-            placeholder="感想を入力..."
-          />
-
-          <button
-            type="submit"
-            className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            投稿する
-          </button>
-        </form>
-      ) : (
-        <p className="text-red-500 mb-3">口コミ投稿にはログインが必要です。</p>
-      )}
-
-      {/* === 口コミ一覧 === */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-2 text-gray-800">口コミ一覧</h3>
-        <div>
-          {reviews.length > 0 ? (
-            reviews.map((r) => (
-              <div key={r.id} className="mb-3 border-b border-gray-200 pb-2">
-                <div className="text-yellow-500 text-sm">
-                  {"★".repeat(r.rating)}
-                  {"☆".repeat(5 - r.rating)}
-                </div>
-                <p className="text-gray-700 text-sm mt-1">{r.comment}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">口コミはまだありません。</p>
+          {selectedEvent?.site_url && (
+            <div>
+              <span className="font-medium">公式サイト: </span>
+              <a
+                href={selectedEvent.site_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline break-words"
+              >
+                {selectedEvent.site_url}
+              </a>
+            </div>
+          )}
+          {selectedEvent?.category && (
+            <div>
+              <span className="font-medium">カテゴリー: </span>
+              {selectedEvent.category}
+            </div>
+          )}
+          {selectedEvent?.start_date && selectedEvent?.end_date && (
+            <div>
+              <span className="font-medium">開催期間: </span>
+              {new Date(selectedEvent.start_date).toLocaleDateString()} ～{" "}
+              {new Date(selectedEvent.end_date).toLocaleDateString()}
+            </div>
+          )}
+          {selectedEvent?.location && (
+            <div>
+              <span className="font-medium">開催場所: </span>
+              {selectedEvent.location}
+            </div>
           )}
         </div>
-      </div>
+
+        {/* 取得状態/エラー */}
+        {err && <p className="text-red-600 mb-3">{err}</p>}
+        {loading && <p className="text-gray-500">読み込み中...</p>}
+
+        {/* === 投稿フォーム / 未ログイン案内 === */}
+        {currentUser ? (
+          <form onSubmit={handleSubmit(onSubmit)} className="mb-6">
+            <h3 className="text-lg font-semibold mb-2 text-gray-800">
+              口コミを投稿
+            </h3>
+
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              評価 (1〜5)
+            </label>
+            <select
+              {...register("rating")}
+              className="w-full border border-gray-300 rounded px-2 py-1 mb-3 bg-white text-gray-800"
+            >
+              {[1, 2, 3, 4, 5].map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              コメント
+            </label>
+            <textarea
+              {...register("comment")}
+              className="w-full border border-gray-300 rounded px-2 py-1 mb-3 bg-white text-gray-800 placeholder-gray-500"
+              rows={3}
+              placeholder="感想を入力..."
+            />
+
+            <button
+              type="submit"
+              className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            >
+              投稿する
+            </button>
+          </form>
+        ) : (
+          <p className="text-red-500 mb-3">
+            口コミ投稿にはログインが必要です。
+          </p>
+        )}
+
+        {/* === 口コミ一覧 === */}
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold mb-2 text-gray-800">
+            口コミ一覧
+          </h3>
+          <div>
+            {reviews.length > 0 ? (
+              reviews.map((r) => (
+                <div key={r.id} className="mb-3 border-b border-gray-200 pb-2">
+                  <div className="text-yellow-500 text-sm">
+                    {"★".repeat(r.rating)}
+                    {"☆".repeat(5 - r.rating)}
+                  </div>
+                  <p className="text-gray-700 text-sm mt-1">{r.comment}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">口コミはまだありません。</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
