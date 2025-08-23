@@ -172,7 +172,14 @@ const MyComponent = () => {
       )}
 
       <div className="flex pt-[80px] md:pt-[60px] h-full">
-        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={11}>
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
+          zoom={11}
+          options={{
+            gestureHandling: "greedy",
+          }}
+        >
           {events.map((event) => (
             <Marker
               key={event.id}
