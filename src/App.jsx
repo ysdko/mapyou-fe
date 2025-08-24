@@ -34,15 +34,15 @@ const MyComponent = () => {
   const [boundsChangeTimeout, setBoundsChangeTimeout] = useState(null);
 
   const iconMap = {
-    0: { img: "/other.svg", size: 40 },
+    0: { img: "/other.png", size: 40 },
     1: { img: "/hanabi.svg", size: 100 },
     2: { img: "/maturi.png", size: 40 },
-    3: { img: "/other.svg", size: 40 },
-    4: { img: "/other.svg", size: 40 },
-    5: { img: "/other.svg", size: 40 },
-    6: { img: "/other.svg", size: 40 },
-    7: { img: "/other.svg", size: 40 },
-    8: { img: "/other.svg", size: 40 },
+    3: { img: "/gurume.png", size: 40 },
+    4: { img: "/art.png", size: 40 },
+    5: { img: "/game.png", size: 40 },
+    6: { img: "/activity.png", size: 40 },
+    7: { img: "/music.png", size: 40 },
+    8: { img: "/other.png", size: 40 },
   };
 
   const fetchEventsInBounds = async (bounds) => {
