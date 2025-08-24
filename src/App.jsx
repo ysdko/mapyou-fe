@@ -36,15 +36,15 @@ const MyComponent = () => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const iconMap = {
-    0: { img: "/other.png", size: 40 },
+    0: { img: "/other.png", size: 30 },
     1: { img: "/hanabi.svg", size: 100 },
-    2: { img: "/maturi.png", size: 40 },
-    3: { img: "/gurume.png", size: 40 },
-    4: { img: "/art.png", size: 40 },
-    5: { img: "/game.png", size: 40 },
-    6: { img: "/activity.png", size: 40 },
-    7: { img: "/music.png", size: 40 },
-    8: { img: "/other.png", size: 40 },
+    2: { img: "/maturi.png", size: 30 },
+    3: { img: "/gurume.png", size: 30 },
+    4: { img: "/art.png", size: 30 },
+    5: { img: "/game.png", size: 30 },
+    6: { img: "/activity.png", size: 30 },
+    7: { img: "/music.png", size: 30 },
+    8: { img: "/other.png", size: 30 },
   };
 
   const fetchEventsInBounds = async (bounds) => {
@@ -152,19 +152,15 @@ const MyComponent = () => {
             <button
               onClick={() => setIsHelpOpen(true)}
               className="text-white rounded-full p-2 shadow-lg transition-colors"
-              style={{ backgroundColor: '#3B82F6' }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#2563EB'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = '#3B82F6'}
+              style={{ backgroundColor: "#3B82F6" }}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#2563EB")}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = "#3B82F6")}
               title="アイコンの説明を見る"
             >
-              <svg 
-                className="w-5 h-5" 
-                fill="currentColor" 
-                viewBox="0 0 20 20"
-              >
-                <path 
-                  fillRule="evenodd" 
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" 
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
                   clipRule="evenodd"
                 />
               </svg>
@@ -213,17 +209,13 @@ const MyComponent = () => {
             <button
               onClick={() => setIsHelpOpen(true)}
               className="text-white rounded-full p-1 shadow-lg transition-colors"
-              style={{ backgroundColor: '#3B82F6', fontSize: "10px" }}
+              style={{ backgroundColor: "#3B82F6", fontSize: "10px" }}
               title="アイコンの説明を見る"
             >
-              <svg 
-                className="w-3 h-3" 
-                fill="currentColor" 
-                viewBox="0 0 20 20"
-              >
-                <path 
-                  fillRule="evenodd" 
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" 
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
                   clipRule="evenodd"
                 />
               </svg>
