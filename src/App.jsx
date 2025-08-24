@@ -104,39 +104,42 @@ const MyComponent = () => {
         </div>
 
         {/* スマホ用ヘッダー */}
-        <div className="md:hidden px-4 py-2">
-          {/* 上段：ロゴ */}
-          <div className="flex items-center space-x-2 mb-1">
-            <img
-              src="/mapyou-logo.png"
-              alt="MAPYOU Logo"
-              className="h-10 w-10"
-            />
-            <h1 className="text-lg font-bold text-gray-800">MAPYOU</h1>
+        <div className="md:hidden px-2 py-0.5">
+          {/* 上段：ロゴとタイトル */}
+          <div className="flex items-center space-x-1 mb-0.5">
+            <img src="/mapyou-logo.png" alt="MAPYOU Logo" className="h-5 w-5" />
+            <h1
+              className="font-bold text-gray-800"
+              style={{ fontSize: "20px" }}
+            >
+              MAPYOU
+            </h1>
           </div>
 
           {/* ユーザー情報 */}
-          <div className="mb-2">
+          <div className="mb-1">
             {username ? (
-              <p className="text-sm text-gray-600">
+              <p className="text-xs text-gray-600">
                 こんにちは, {username.username}さん
               </p>
             ) : (
-              <p className="text-sm text-gray-600">未ログイン</p>
+              <p className="text-xs text-gray-600">未ログイン</p>
             )}
           </div>
 
           {/* 下段：ボタン */}
-          <div className="flex space-x-2">
+          <div className="flex space-x-1 mb-1">
             <button
               onClick={() => navigate("/signin")}
-              className="flex-1 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm py-2.5 px-3 text-center"
+              className="flex-1 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-red-300 font-medium rounded py-0.5 px-1.5 text-center"
+              style={{ fontSize: "10px" }}
             >
               ログイン
             </button>
             <button
               onClick={() => navigate("/signup")}
-              className="flex-1 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm py-2.5 px-3 text-center"
+              className="flex-1 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-red-300 font-medium rounded py-0.5 px-1.5 text-center"
+              style={{ fontSize: "10px" }}
             >
               新規作成
             </button>
@@ -171,13 +174,17 @@ const MyComponent = () => {
         </>
       )}
 
-      <div className="flex pt-[80px] md:pt-[60px] h-full">
+      <div className="flex pt-[45px] md:pt-[60px] h-full">
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={center}
           zoom={11}
           options={{
             gestureHandling: "greedy",
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+            zoomControl: false,
           }}
         >
           {events.map((event) => (
