@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
 import Sidebar from "./Sidebar.jsx";
+import CategoryIconHelp from "./CategoryIconHelp.jsx";
 
 const containerStyle = {
   width: "100%",
@@ -32,6 +33,7 @@ const MyComponent = () => {
   const [map, setMap] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [boundsChangeTimeout, setBoundsChangeTimeout] = useState(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const iconMap = {
     0: { img: "/other.png", size: 40 },
@@ -146,7 +148,27 @@ const MyComponent = () => {
           ) : (
             <p>ログインしていません</p>
           )}
-          <div className="space-x-4">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setIsHelpOpen(true)}
+              className="text-white rounded-full p-2 shadow-lg transition-colors"
+              style={{ backgroundColor: '#3B82F6' }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#2563EB'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#3B82F6'}
+              title="アイコンの説明を見る"
+            >
+              <svg 
+                className="w-5 h-5" 
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" 
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
             <button
               onClick={() => navigate("/signin")}
               className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
@@ -188,6 +210,24 @@ const MyComponent = () => {
 
           {/* 下段：ボタン */}
           <div className="flex space-x-1 mb-1">
+            <button
+              onClick={() => setIsHelpOpen(true)}
+              className="text-white rounded-full p-1 shadow-lg transition-colors"
+              style={{ backgroundColor: '#3B82F6', fontSize: "10px" }}
+              title="アイコンの説明を見る"
+            >
+              <svg 
+                className="w-3 h-3" 
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" 
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
             <button
               onClick={() => navigate("/signin")}
               className="flex-1 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-2 focus:outline-none focus:ring-red-300 font-medium rounded py-0.5 px-1.5 text-center"
@@ -296,6 +336,9 @@ const MyComponent = () => {
           ))}
         </GoogleMap>
       </div>
+
+      {/* カテゴリヘルプ */}
+      <CategoryIconHelp isOpen={isHelpOpen} setIsOpen={setIsHelpOpen} />
     </div>
   );
 };
