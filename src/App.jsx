@@ -80,7 +80,7 @@ const MyComponent = () => {
       const bounds = map.getBounds();
       fetchEventsInBounds(bounds);
     }
-  }, [map]);
+  }, [map, mapCenter]);
 
   useEffect(() => {
     const fetchUser = async () => {
