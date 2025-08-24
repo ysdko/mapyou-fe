@@ -37,23 +37,29 @@ const MyComponent = () => {
     0: { img: "/other.svg", size: 40 },
     1: { img: "/hanabi.svg", size: 100 },
     2: { img: "/maturi.png", size: 40 },
+    3: { img: "/other.svg", size: 40 },
+    4: { img: "/other.svg", size: 40 },
+    5: { img: "/other.svg", size: 40 },
+    6: { img: "/other.svg", size: 40 },
+    7: { img: "/other.svg", size: 40 },
+    8: { img: "/other.svg", size: 40 },
   };
 
   const fetchEventsInBounds = async (bounds) => {
     if (!bounds) return;
-    
+
     setIsLoading(true);
     try {
       const ne = bounds.getNorthEast();
       const sw = bounds.getSouthWest();
-      
+
       const params = new URLSearchParams({
         north: ne.lat(),
         south: sw.lat(),
         east: ne.lng(),
         west: sw.lng(),
       });
-      
+
       const res = await fetch(`${API_BASE}/events/bounds?${params}`);
       if (!res.ok) {
         throw new Error("Failed to fetch events");
@@ -247,12 +253,12 @@ const MyComponent = () => {
               if (boundsChangeTimeout) {
                 clearTimeout(boundsChangeTimeout);
               }
-              
+
               const newTimeout = setTimeout(() => {
                 const bounds = map.getBounds();
                 fetchEventsInBounds(bounds);
               }, 500);
-              
+
               setBoundsChangeTimeout(newTimeout);
             }
           }}
