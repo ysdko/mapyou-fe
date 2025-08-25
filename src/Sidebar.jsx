@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 
 export default function Sidebar({
@@ -23,33 +23,35 @@ export default function Sidebar({
   const eventId = selectedEvent?.id;
 
   // 一覧取得
-  const fetchReviews = useMemo(
-    () => async () => {
-      if (!eventId) return;
-      setLoading(true);
-      setErr("");
-      try {
-        const res = await fetch(
-          `${API_BASE}/reviews/${encodeURIComponent(eventId)}`,
-          { method: "GET", credentials: "include" }
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        setReviews(Array.isArray(data) ? data : []);
-      } catch (e) {
-        console.error(e);
-        setErr("レビューの取得に失敗しました。");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [API_BASE, eventId]
-  );
+  const fetchReviews = useCallback(async () => {
+    if (!eventId) return;
+    setLoading(true);
+    setErr("");
+    try {
+      const res = await fetch(
+        `${API_BASE}/reviews/${encodeURIComponent(eventId)}`,
+        { method: "GET", credentials: "include" }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setReviews(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error(e);
+      setErr("レビューの取得に失敗しました。");
+    } finally {
+      setLoading(false);
+    }
+  }, [API_BASE, eventId]);
 
-  // サイドバーが開かれた（= selectedEvent が変わった）タイミングで取得
+  // eventIdが変わった時のみレビューを取得
   useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
+    if (eventId) {
+      fetchReviews();
+    } else {
+      // eventIdがない場合はレビューリストをクリア
+      setReviews([]);
+    }
+  }, [eventId, fetchReviews]);
 
   // 投稿
   async function onSubmit(data) {
