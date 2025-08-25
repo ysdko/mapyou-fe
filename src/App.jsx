@@ -36,6 +36,7 @@ const MyComponent = () => {
   const [boundsChangeTimeout, setBoundsChangeTimeout] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [eventPeriod, setEventPeriod] = useState("today"); // "today", "weekend", "all"
+  const [currentAbortController, setCurrentAbortController] = useState(null);
 
   const iconMap = {
     0: { img: "/other.png", size: 30 },
@@ -52,7 +53,15 @@ const MyComponent = () => {
   const fetchEventsInBounds = async (bounds, period = eventPeriod) => {
     if (!bounds) return;
 
+    // 前のリクエストをキャンセル
+    if (currentAbortController) {
+      currentAbortController.abort();
+    }
+
+    const abortController = new AbortController();
+    setCurrentAbortController(abortController);
     setIsLoading(true);
+    
     try {
       const ne = bounds.getNorthEast();
       const sw = bounds.getSouthWest();
@@ -66,16 +75,30 @@ const MyComponent = () => {
         period: period, // 期間フィルター
       });
 
-      const res = await fetch(`${API_BASE}/events/bounds?${params}`);
+      const res = await fetch(`${API_BASE}/events/bounds?${params}`, {
+        signal: abortController.signal
+      });
       if (!res.ok) {
         throw new Error("Failed to fetch events");
       }
       const data = await res.json();
-      setEvents(data);
+      
+      // コンポーネントがまだマウントされている場合のみ状態更新
+      if (!abortController.signal.aborted) {
+        setEvents(Array.isArray(data) ? data : []);
+      }
     } catch (err) {
-      console.error("Error fetching events:", err);
+      if (err.name !== 'AbortError') {
+        console.error("Error fetching events:", err);
+        // コンポーネントがまだマウントされている場合のみ状態更新
+        if (!abortController.signal.aborted) {
+          setEvents([]);
+        }
+      }
     } finally {
-      setIsLoading(false);
+      if (!abortController.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -160,6 +183,15 @@ const MyComponent = () => {
 
     getCurrentLocation();
   }, []);
+
+  // コンポーネントアンマウント時のクリーンアップ
+  useEffect(() => {
+    return () => {
+      if (currentAbortController) {
+        currentAbortController.abort();
+      }
+    };
+  }, [currentAbortController]);
   return (
     <div className="relative w-screen h-screen overflow-hidden">
       {/* ヘッダー */}
@@ -431,8 +463,14 @@ const MyComponent = () => {
               }
 
               const newTimeout = setTimeout(() => {
-                const bounds = map.getBounds();
-                fetchEventsInBounds(bounds, eventPeriod);
+                try {
+                  const bounds = map?.getBounds();
+                  if (bounds) {
+                    fetchEventsInBounds(bounds, eventPeriod);
+                  }
+                } catch (error) {
+                  console.error("Error getting map bounds:", error);
+                }
               }, 500);
 
               setBoundsChangeTimeout(newTimeout);
@@ -456,7 +494,7 @@ const MyComponent = () => {
               title="現在地"
             />
           )}
-          {events.map((event) => (
+          {events && Array.isArray(events) && events.map((event) => (
             <Marker
               key={event.id}
               position={{ lat: event.lat, lng: event.lng }}
