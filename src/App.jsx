@@ -333,11 +333,11 @@ const MyComponent = () => {
                 className={`flex-1 font-medium rounded py-0.5 px-1.5 text-center transition-colors whitespace-nowrap ${
                   eventPeriod === "today"
                     ? "text-white"
-                    : "bg-gray-100 text-gray-700"
+                    : "text-gray-700"
                 }`}
                 style={{
                   backgroundColor:
-                    eventPeriod === "today" ? "#3B82F6" : undefined,
+                    eventPeriod === "today" ? "#3B82F6" : "#F3F4F6",
                   fontSize: "10px",
                 }}
               >
@@ -348,11 +348,11 @@ const MyComponent = () => {
                 className={`flex-1 font-medium rounded py-0.5 px-1.5 text-center transition-colors whitespace-nowrap ${
                   eventPeriod === "weekend"
                     ? "text-white"
-                    : "bg-gray-100 text-gray-700"
+                    : "text-gray-700"
                 }`}
                 style={{
                   backgroundColor:
-                    eventPeriod === "weekend" ? "#3B82F6" : undefined,
+                    eventPeriod === "weekend" ? "#3B82F6" : "#F3F4F6",
                   fontSize: "10px",
                 }}
               >
@@ -363,11 +363,11 @@ const MyComponent = () => {
                 className={`flex-1 font-medium rounded py-0.5 px-1.5 text-center transition-colors whitespace-nowrap ${
                   eventPeriod === "all"
                     ? "text-white"
-                    : "bg-gray-100 text-gray-700"
+                    : "text-gray-700"
                 }`}
                 style={{
                   backgroundColor:
-                    eventPeriod === "all" ? "#3B82F6" : undefined,
+                    eventPeriod === "all" ? "#3B82F6" : "#F3F4F6",
                   fontSize: "10px",
                 }}
               >
