@@ -35,6 +35,7 @@ const MyComponent = () => {
   const [isLoadingEventDetails, setIsLoadingEventDetails] = useState(false);
   const [boundsChangeTimeout, setBoundsChangeTimeout] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [eventPeriod, setEventPeriod] = useState("today"); // "today", "weekend", "all"
 
   const iconMap = {
     0: { img: "/other.png", size: 30 },
@@ -48,7 +49,7 @@ const MyComponent = () => {
     8: { img: "/other.png", size: 30 },
   };
 
-  const fetchEventsInBounds = async (bounds) => {
+  const fetchEventsInBounds = async (bounds, period = eventPeriod) => {
     if (!bounds) return;
 
     setIsLoading(true);
@@ -61,7 +62,8 @@ const MyComponent = () => {
         south: sw.lat(),
         east: ne.lng(),
         west: sw.lng(),
-        fields: "id,lat,lng,icon_category" // マップ表示用の軽量データのみ取得
+        fields: "id,lat,lng,icon_category", // マップ表示用の軽量データのみ取得
+        period: period, // 期間フィルター
       });
 
       const res = await fetch(`${API_BASE}/events/bounds?${params}`);
@@ -100,6 +102,14 @@ const MyComponent = () => {
       fetchEventsInBounds(bounds);
     }
   }, [map]);
+
+  // 期間フィルターが変更された時にイベントを再取得
+  useEffect(() => {
+    if (map) {
+      const bounds = map.getBounds();
+      fetchEventsInBounds(bounds, eventPeriod);
+    }
+  }, [eventPeriod]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -155,49 +165,107 @@ const MyComponent = () => {
       {/* ヘッダー */}
       <header className="absolute top-0 left-0 right-0 bg-white shadow z-10">
         {/* PC用ヘッダー */}
-        <div className="hidden md:flex justify-between items-center px-6 py-3">
-          <div className="flex items-center space-x-2">
-            <img
-              src="/mapyou-logo.png"
-              alt="MAPYOU Logo"
-              className="h-15 w-15"
-            />
-            <h1 className="text-xl font-bold text-gray-800">MAPYOU</h1>
+        <div className="hidden md:block">
+          <div className="flex justify-between items-center px-6 py-2">
+            <div className="flex items-center space-x-2">
+              <img
+                src="/mapyou-logo.png"
+                alt="MAPYOU Logo"
+                className="h-15 w-15"
+              />
+              <h1 className="text-xl font-bold text-gray-800">MAPYOU</h1>
+            </div>
+            {username ? (
+              <p>こんにちは, {username.username} さん</p>
+            ) : (
+              <p>ログインしていません</p>
+            )}
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setIsHelpOpen(true)}
+                className="text-white rounded-full p-2 shadow-lg transition-colors"
+                style={{ backgroundColor: "#3B82F6" }}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#2563EB")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#3B82F6")
+                }
+                title="アイコンの説明を見る"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={() => navigate("/signin")}
+                className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              >
+                ログイン
+              </button>
+              <button
+                onClick={() => navigate("/signup")}
+                className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              >
+                新規作成
+              </button>
+            </div>
           </div>
-          {username ? (
-            <p>こんにちは, {username.username} さん</p>
-          ) : (
-            <p>ログインしていません</p>
-          )}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setIsHelpOpen(true)}
-              className="text-white rounded-full p-2 shadow-lg transition-colors"
-              style={{ backgroundColor: "#3B82F6" }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = "#2563EB")}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = "#3B82F6")}
-              title="アイコンの説明を見る"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={() => navigate("/signin")}
-              className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-            >
-              ログイン
-            </button>
-            <button
-              onClick={() => navigate("/signup")}
-              className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-            >
-              新規作成
-            </button>
+
+          {/* PC用期間タブ */}
+          <div className="flex justify-center border-t border-gray-200 py-2">
+            <div className="flex space-x-1">
+              <button
+                onClick={() => setEventPeriod("today")}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  eventPeriod === "today"
+                    ? "text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+                style={{
+                  backgroundColor:
+                    eventPeriod === "today" ? "#3B82F6" : undefined,
+                }}
+              >
+                今日
+              </button>
+              <button
+                onClick={() => setEventPeriod("weekend")}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  eventPeriod === "weekend"
+                    ? "text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+                style={{
+                  backgroundColor:
+                    eventPeriod === "weekend" ? "#3B82F6" : undefined,
+                }}
+              >
+                今週末
+              </button>
+              <button
+                onClick={() => setEventPeriod("all")}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  eventPeriod === "all"
+                    ? "text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+                style={{
+                  backgroundColor:
+                    eventPeriod === "all" ? "#3B82F6" : undefined,
+                }}
+              >
+                今月
+              </button>
+            </div>
           </div>
         </div>
 
@@ -256,6 +324,57 @@ const MyComponent = () => {
               新規作成
             </button>
           </div>
+
+          {/* スマホ用期間タブ */}
+          <div className="flex justify-center border-t border-gray-200 py-1">
+            <div className="flex space-x-1">
+              <button
+                onClick={() => setEventPeriod("today")}
+                className={`flex-1 font-medium rounded py-0.5 px-1.5 text-center transition-colors whitespace-nowrap ${
+                  eventPeriod === "today"
+                    ? "text-white"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+                style={{
+                  backgroundColor:
+                    eventPeriod === "today" ? "#3B82F6" : undefined,
+                  fontSize: "10px",
+                }}
+              >
+                今日
+              </button>
+              <button
+                onClick={() => setEventPeriod("weekend")}
+                className={`flex-1 font-medium rounded py-0.5 px-1.5 text-center transition-colors whitespace-nowrap ${
+                  eventPeriod === "weekend"
+                    ? "text-white"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+                style={{
+                  backgroundColor:
+                    eventPeriod === "weekend" ? "#3B82F6" : undefined,
+                  fontSize: "10px",
+                }}
+              >
+                今週末
+              </button>
+              <button
+                onClick={() => setEventPeriod("all")}
+                className={`flex-1 font-medium rounded py-0.5 px-1.5 text-center transition-colors whitespace-nowrap ${
+                  eventPeriod === "all"
+                    ? "text-white"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+                style={{
+                  backgroundColor:
+                    eventPeriod === "all" ? "#3B82F6" : undefined,
+                  fontSize: "10px",
+                }}
+              >
+                今月
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -287,17 +406,19 @@ const MyComponent = () => {
       )}
 
       {(isLoading || isLoadingEventDetails) && (
-        <div className="absolute top-[50px] md:top-[70px] left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-lg z-20">
+        <div className="absolute top-[80px] md:top-[100px] left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-lg z-20">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
             <span className="text-sm text-gray-600">
-              {isLoadingEventDetails ? "イベント詳細を読み込み中..." : "読み込み中..."}
+              {isLoadingEventDetails
+                ? "イベント詳細を読み込み中..."
+                : "読み込み中..."}
             </span>
           </div>
         </div>
       )}
 
-      <div className="flex pt-[45px] md:pt-[60px] h-full">
+      <div className="flex pt-[80px] md:pt-[120px] h-full">
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={mapCenter}
@@ -311,7 +432,7 @@ const MyComponent = () => {
 
               const newTimeout = setTimeout(() => {
                 const bounds = map.getBounds();
-                fetchEventsInBounds(bounds);
+                fetchEventsInBounds(bounds, eventPeriod);
               }, 500);
 
               setBoundsChangeTimeout(newTimeout);
