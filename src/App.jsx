@@ -113,16 +113,18 @@ const MyComponent = () => {
           },
           (error) => {
             console.error("位置情報の取得に失敗しました:", error);
+            // 現在地取得失敗時のみデフォルト位置を設定
             setMapCenter(defaultCenter);
           },
           {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 600000,
+            enableHighAccuracy: false, // 高精度を無効にして高速化
+            timeout: 3000, // タイムアウトを3秒に短縮
+            maximumAge: 300000, // キャッシュ時間を5分に短縮
           }
         );
       } else {
         console.error("このブラウザは位置情報をサポートしていません");
+        // 位置情報サポートなし時にデフォルト位置を設定
         setMapCenter(defaultCenter);
       }
     };
