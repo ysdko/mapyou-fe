@@ -32,6 +32,7 @@ const MyComponent = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [map, setMap] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingEventDetails, setIsLoadingEventDetails] = useState(false);
   const [boundsChangeTimeout, setBoundsChangeTimeout] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
@@ -60,6 +61,7 @@ const MyComponent = () => {
         south: sw.lat(),
         east: ne.lng(),
         west: sw.lng(),
+        fields: "id,lat,lng,icon_category" // マップ表示用の軽量データのみ取得
       });
 
       const res = await fetch(`${API_BASE}/events/bounds?${params}`);
@@ -72,6 +74,23 @@ const MyComponent = () => {
       console.error("Error fetching events:", err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchEventDetails = async (eventId) => {
+    setIsLoadingEventDetails(true);
+    try {
+      const res = await fetch(`${API_BASE}/events/${eventId}`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch event details");
+      }
+      const eventDetails = await res.json();
+      return eventDetails;
+    } catch (err) {
+      console.error("Error fetching event details:", err);
+      return null;
+    } finally {
+      setIsLoadingEventDetails(false);
     }
   };
 
@@ -267,11 +286,13 @@ const MyComponent = () => {
         </>
       )}
 
-      {isLoading && (
+      {(isLoading || isLoadingEventDetails) && (
         <div className="absolute top-[50px] md:top-[70px] left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-lg z-20">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
-            <span className="text-sm text-gray-600">読み込み中...</span>
+            <span className="text-sm text-gray-600">
+              {isLoadingEventDetails ? "イベント詳細を読み込み中..." : "読み込み中..."}
+            </span>
           </div>
         </div>
       )}
@@ -318,7 +339,12 @@ const MyComponent = () => {
             <Marker
               key={event.id}
               position={{ lat: event.lat, lng: event.lng }}
-              onClick={() => setSelectedEvent(event)}
+              onClick={async () => {
+                const eventDetails = await fetchEventDetails(event.id);
+                if (eventDetails) {
+                  setSelectedEvent(eventDetails);
+                }
+              }}
               icon={{
                 url: iconMap[event.icon_category]["img"],
                 scaledSize: new window.google.maps.Size(
