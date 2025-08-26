@@ -287,97 +287,101 @@ const MyComponent = () => {
             </div>
           </div>
 
-          {/* PC用期間タブ */}
-          <div className="flex justify-center border-t border-gray-200 py-2">
-            <div className="flex space-x-1">
-              <button
-                onClick={() => setEventPeriod("today")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  eventPeriod === "today"
-                    ? "text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-                style={{
-                  backgroundColor:
-                    eventPeriod === "today" ? "#3B82F6" : undefined,
-                }}
-              >
-                今日
-              </button>
-              <button
-                onClick={() => setEventPeriod("weekend")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  eventPeriod === "weekend"
-                    ? "text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-                style={{
-                  backgroundColor:
-                    eventPeriod === "weekend" ? "#3B82F6" : undefined,
-                }}
-              >
-                今週末
-              </button>
-              <button
-                onClick={() => setEventPeriod("all")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  eventPeriod === "all"
-                    ? "text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-                style={{
-                  backgroundColor:
-                    eventPeriod === "all" ? "#3B82F6" : undefined,
-                }}
-              >
-                今月
-              </button>
-            </div>
-          </div>
-
-          {/* PC用カテゴリフィルター */}
-          <div className="border-t border-gray-200 py-2 px-4">
+          {/* PC用フィルター（期間とカテゴリ） */}
+          <div className="py-2 px-4">
             <div className="flex justify-center">
-              <div className="flex items-center space-x-2 overflow-x-auto max-w-full">
+              <div className="flex items-center space-x-3 overflow-x-auto max-w-full">
+                {/* 期間フィルター */}
                 <div className="flex space-x-1 flex-shrink-0">
                   <button
-                    onClick={selectedCategories.size === 0 ? showAllCategories : hideAllCategories}
-                    className="px-3 py-1 text-xs font-medium rounded-full transition-all whitespace-nowrap text-white shadow-lg"
+                    onClick={() => setEventPeriod("today")}
+                    className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
+                      eventPeriod === "today"
+                        ? "text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
                     style={{
-                      backgroundColor: selectedCategories.size === 0 ? "#10B981" : "#EF4444",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = selectedCategories.size === 0 ? "#059669" : "#DC2626";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = selectedCategories.size === 0 ? "#10B981" : "#EF4444";
+                      backgroundColor:
+                        eventPeriod === "today" ? "#3B82F6" : undefined,
                     }}
                   >
-                    {selectedCategories.size === 0 ? "すべて表示" : "すべて非表示"}
+                    今日
+                  </button>
+                  <button
+                    onClick={() => setEventPeriod("weekend")}
+                    className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
+                      eventPeriod === "weekend"
+                        ? "text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                    style={{
+                      backgroundColor:
+                        eventPeriod === "weekend" ? "#3B82F6" : undefined,
+                    }}
+                  >
+                    今週末
+                  </button>
+                  <button
+                    onClick={() => setEventPeriod("all")}
+                    className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
+                      eventPeriod === "all"
+                        ? "text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                    style={{
+                      backgroundColor:
+                        eventPeriod === "all" ? "#3B82F6" : undefined,
+                    }}
+                  >
+                    今月
                   </button>
                 </div>
-                <div className="flex space-x-1">
-                  {[0, 1, 2, 3, 4, 5, 6, 7].map(categoryId => (
+
+                {/* 区切り線 */}
+                <div className="h-6 w-px bg-gray-300 flex-shrink-0"></div>
+
+                {/* カテゴリフィルター */}
+                <div className="flex items-center space-x-2">
+                  <div className="flex space-x-1 flex-shrink-0">
                     <button
-                      key={categoryId}
-                      onClick={() => toggleCategory(categoryId)}
-                      className={`flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
-                        selectedCategories.has(categoryId)
-                          ? "text-white shadow-lg"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                      }`}
+                      onClick={selectedCategories.size === 0 ? showAllCategories : hideAllCategories}
+                      className="px-3 py-1 text-xs font-medium rounded-full transition-all whitespace-nowrap text-white shadow-lg"
                       style={{
-                        backgroundColor: selectedCategories.has(categoryId) ? "#3B82F6" : undefined,
+                        backgroundColor: selectedCategories.size === 0 ? "#3B82F6" : "#6B7280",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = selectedCategories.size === 0 ? "#2563EB" : "#4B5563";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = selectedCategories.size === 0 ? "#3B82F6" : "#6B7280";
                       }}
                     >
-                      <img
-                        src={iconMap[categoryId].img}
-                        alt={categoryNames[categoryId]}
-                        className="w-4 h-4"
-                      />
-                      <span>{categoryNames[categoryId]}</span>
+                      {selectedCategories.size === 0 ? "すべて表示" : "すべて非表示"}
                     </button>
-                  ))}
+                  </div>
+                  <div className="flex space-x-1">
+                    {[1, 2, 3, 4, 5, 6, 7, 0].map(categoryId => (
+                      <button
+                        key={categoryId}
+                        onClick={() => toggleCategory(categoryId)}
+                        className={`flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
+                          selectedCategories.has(categoryId)
+                            ? "text-white shadow-lg"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                        style={{
+                          backgroundColor: selectedCategories.has(categoryId) ? "#3B82F6" : undefined,
+                        }}
+                      >
+                        <img
+                          src={iconMap[categoryId].img}
+                          alt={categoryNames[categoryId]}
+                          className="w-4 h-4"
+                        />
+                        <span>{categoryNames[categoryId]}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -440,104 +444,111 @@ const MyComponent = () => {
             </button>
           </div>
 
-          {/* スマホ用期間タブ */}
-          <div className="flex justify-center border-t border-gray-200 py-1">
-            <div className="flex space-x-1">
-              <button
-                onClick={() => setEventPeriod("today")}
-                className={`flex-1 font-medium rounded py-0.5 px-1.5 text-center transition-colors whitespace-nowrap ${
-                  eventPeriod === "today"
-                    ? "text-white"
-                    : "text-gray-700"
-                }`}
-                style={{
-                  backgroundColor:
-                    eventPeriod === "today" ? "#3B82F6" : "#F3F4F6",
-                  fontSize: "10px",
-                }}
-              >
-                今日
-              </button>
-              <button
-                onClick={() => setEventPeriod("weekend")}
-                className={`flex-1 font-medium rounded py-0.5 px-1.5 text-center transition-colors whitespace-nowrap ${
-                  eventPeriod === "weekend"
-                    ? "text-white"
-                    : "text-gray-700"
-                }`}
-                style={{
-                  backgroundColor:
-                    eventPeriod === "weekend" ? "#3B82F6" : "#F3F4F6",
-                  fontSize: "10px",
-                }}
-              >
-                今週末
-              </button>
-              <button
-                onClick={() => setEventPeriod("all")}
-                className={`flex-1 font-medium rounded py-0.5 px-1.5 text-center transition-colors whitespace-nowrap ${
-                  eventPeriod === "all"
-                    ? "text-white"
-                    : "text-gray-700"
-                }`}
-                style={{
-                  backgroundColor:
-                    eventPeriod === "all" ? "#3B82F6" : "#F3F4F6",
-                  fontSize: "10px",
-                }}
-              >
-                今月
-              </button>
-            </div>
-          </div>
-
-          {/* スマホ用カテゴリフィルター */}
-          <div className="border-t border-gray-200 py-1 px-1">
+          {/* スマホ用フィルター（期間とカテゴリ） */}
+          <div className="py-1 px-1 pb-2">
             <div className="flex justify-center">
-              <div className="flex items-center space-x-1 overflow-x-auto max-w-full">
-                <div className="flex-shrink-0">
+              <div className="flex items-center space-x-2 overflow-x-auto max-w-full">
+                {/* 期間フィルター */}
+                <div className="flex space-x-0.5 flex-shrink-0">
                   <button
-                    onClick={selectedCategories.size === 0 ? showAllCategories : hideAllCategories}
-                    className="rounded-full transition-all whitespace-nowrap text-white shadow-sm"
+                    onClick={() => setEventPeriod("today")}
+                    className={`font-medium rounded text-center transition-colors whitespace-nowrap ${
+                      eventPeriod === "today"
+                        ? "text-white"
+                        : "text-gray-700"
+                    }`}
                     style={{
-                      backgroundColor: selectedCategories.size === 0 ? "#10B981" : "#EF4444",
-                      fontSize: "7px",
+                      backgroundColor:
+                        eventPeriod === "today" ? "#3B82F6" : "#F3F4F6",
+                      fontSize: "8px",
                       padding: "2px 6px",
                     }}
-                    onTouchStart={(e) => {
-                      e.target.style.backgroundColor = selectedCategories.size === 0 ? "#059669" : "#DC2626";
-                    }}
-                    onTouchEnd={(e) => {
-                      e.target.style.backgroundColor = selectedCategories.size === 0 ? "#10B981" : "#EF4444";
+                  >
+                    今日
+                  </button>
+                  <button
+                    onClick={() => setEventPeriod("weekend")}
+                    className={`font-medium rounded text-center transition-colors whitespace-nowrap ${
+                      eventPeriod === "weekend"
+                        ? "text-white"
+                        : "text-gray-700"
+                    }`}
+                    style={{
+                      backgroundColor:
+                        eventPeriod === "weekend" ? "#3B82F6" : "#F3F4F6",
+                      fontSize: "8px",
+                      padding: "2px 6px",
                     }}
                   >
-                    {selectedCategories.size === 0 ? "すべて表示" : "すべて非表示"}
+                    今週末
+                  </button>
+                  <button
+                    onClick={() => setEventPeriod("all")}
+                    className={`font-medium rounded text-center transition-colors whitespace-nowrap ${
+                      eventPeriod === "all"
+                        ? "text-white"
+                        : "text-gray-700"
+                    }`}
+                    style={{
+                      backgroundColor:
+                        eventPeriod === "all" ? "#3B82F6" : "#F3F4F6",
+                      fontSize: "8px",
+                      padding: "2px 6px",
+                    }}
+                  >
+                    今月
                   </button>
                 </div>
-                <div className="flex space-x-1">
-                  {[0, 1, 2, 3, 4, 5, 6, 7].map(categoryId => (
+
+                {/* 区切り線 */}
+                <div className="h-4 w-px bg-gray-300 flex-shrink-0"></div>
+
+                {/* カテゴリフィルター */}
+                <div className="flex items-center space-x-1">
+                  <div className="flex-shrink-0">
                     <button
-                      key={categoryId}
-                      onClick={() => toggleCategory(categoryId)}
-                      className={`flex items-center space-x-0.5 rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
-                        selectedCategories.has(categoryId)
-                          ? "text-white shadow-sm"
-                          : "text-gray-600"
-                      }`}
+                      onClick={selectedCategories.size === 0 ? showAllCategories : hideAllCategories}
+                      className="rounded-full transition-all whitespace-nowrap text-white shadow-sm"
                       style={{
-                        backgroundColor: selectedCategories.has(categoryId) ? "#3B82F6" : "#F3F4F6",
-                        fontSize: "8px",
-                        padding: "2px 4px",
+                        backgroundColor: selectedCategories.size === 0 ? "#3B82F6" : "#6B7280",
+                        fontSize: "7px",
+                        padding: "2px 6px",
+                      }}
+                      onTouchStart={(e) => {
+                        e.target.style.backgroundColor = selectedCategories.size === 0 ? "#2563EB" : "#4B5563";
+                      }}
+                      onTouchEnd={(e) => {
+                        e.target.style.backgroundColor = selectedCategories.size === 0 ? "#3B82F6" : "#6B7280";
                       }}
                     >
-                      <img
-                        src={iconMap[categoryId].img}
-                        alt={categoryNames[categoryId]}
-                        className="w-2.5 h-2.5"
-                      />
-                      <span>{categoryNames[categoryId]}</span>
+                      {selectedCategories.size === 0 ? "すべて表示" : "すべて非表示"}
                     </button>
-                  ))}
+                  </div>
+                  <div className="flex space-x-0.5">
+                    {[1, 2, 3, 4, 5, 6, 7, 0].map(categoryId => (
+                      <button
+                        key={categoryId}
+                        onClick={() => toggleCategory(categoryId)}
+                        className={`flex items-center space-x-0.5 rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
+                          selectedCategories.has(categoryId)
+                            ? "text-white shadow-sm"
+                            : "text-gray-600"
+                        }`}
+                        style={{
+                          backgroundColor: selectedCategories.has(categoryId) ? "#3B82F6" : "#F3F4F6",
+                          fontSize: "7px",
+                          padding: "1px 3px",
+                        }}
+                      >
+                        <img
+                          src={iconMap[categoryId].img}
+                          alt={categoryNames[categoryId]}
+                          className="w-2 h-2"
+                        />
+                        <span>{categoryNames[categoryId]}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -573,7 +584,7 @@ const MyComponent = () => {
       )}
 
       {(isLoading || isLoadingEventDetails) && (
-        <div className="absolute top-[120px] md:top-[150px] left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-lg z-20">
+        <div className="absolute top-[100px] md:top-[120px] left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-lg z-20">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
             <span className="text-sm text-gray-600">
@@ -585,7 +596,7 @@ const MyComponent = () => {
         </div>
       )}
 
-      <div className="flex pt-[120px] md:pt-[180px] h-full">
+      <div className="flex pt-[100px] md:pt-[120px] h-full">
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={mapCenter}

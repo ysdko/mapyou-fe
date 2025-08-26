@@ -17,7 +17,6 @@ export default function Sidebar({
     register,
     handleSubmit,
     reset,
-    formState: { errors },
   } = useForm({ defaultValues: { rating: 5, comment: "" } });
 
   const eventId = selectedEvent?.id;
