@@ -37,7 +37,9 @@ const MyComponent = () => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [eventPeriod, setEventPeriod] = useState("today"); // "today", "weekend", "all"
   const [currentAbortController, setCurrentAbortController] = useState(null);
-  const [selectedCategories, setSelectedCategories] = useState(new Set([0, 1, 2, 3, 4, 5, 6, 7])); // すべてのカテゴリを初期選択
+  const [selectedCategories, setSelectedCategories] = useState(
+    new Set([0, 1, 2, 3, 4, 5, 6, 7])
+  ); // すべてのカテゴリを初期選択
 
   const iconMap = {
     0: { img: "/other.png", size: 30 },
@@ -54,16 +56,16 @@ const MyComponent = () => {
   const categoryNames = {
     0: "その他",
     1: "花火",
-    2: "祭り", 
+    2: "祭り",
     3: "グルメ",
     4: "アート",
-    5: "ゲーム",
+    5: "ゲーム/アニメ",
     6: "アクティビティ",
-    7: "音楽"
+    7: "音楽",
   };
 
   const toggleCategory = (categoryId) => {
-    setSelectedCategories(prev => {
+    setSelectedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(categoryId)) {
         newSet.delete(categoryId);
@@ -82,60 +84,63 @@ const MyComponent = () => {
     setSelectedCategories(new Set([0, 1, 2, 3, 4, 5, 6, 7]));
   };
 
-  const fetchEventsInBounds = useCallback(async (bounds, period = eventPeriod) => {
-    if (!bounds) return;
+  const fetchEventsInBounds = useCallback(
+    async (bounds, period = eventPeriod) => {
+      if (!bounds) return;
 
-    // 前のリクエストをキャンセル
-    setCurrentAbortController(prev => {
-      if (prev) {
-        prev.abort();
-      }
-      return null;
-    });
-
-    const abortController = new AbortController();
-    setCurrentAbortController(abortController);
-    setIsLoading(true);
-    
-    try {
-      const ne = bounds.getNorthEast();
-      const sw = bounds.getSouthWest();
-
-      const params = new URLSearchParams({
-        north: ne.lat(),
-        south: sw.lat(),
-        east: ne.lng(),
-        west: sw.lng(),
-        fields: "id,lat,lng,icon_category", // マップ表示用の軽量データのみ取得
-        period: period, // 期間フィルター
+      // 前のリクエストをキャンセル
+      setCurrentAbortController((prev) => {
+        if (prev) {
+          prev.abort();
+        }
+        return null;
       });
 
-      const res = await fetch(`${API_BASE}/events/bounds?${params}`, {
-        signal: abortController.signal
-      });
-      if (!res.ok) {
-        throw new Error("Failed to fetch events");
-      }
-      const data = await res.json();
-      
-      // コンポーネントがまだマウントされている場合のみ状態更新
-      if (!abortController.signal.aborted) {
-        setEvents(Array.isArray(data) ? data : []);
-      }
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        console.error("Error fetching events:", err);
+      const abortController = new AbortController();
+      setCurrentAbortController(abortController);
+      setIsLoading(true);
+
+      try {
+        const ne = bounds.getNorthEast();
+        const sw = bounds.getSouthWest();
+
+        const params = new URLSearchParams({
+          north: ne.lat(),
+          south: sw.lat(),
+          east: ne.lng(),
+          west: sw.lng(),
+          fields: "id,lat,lng,icon_category", // マップ表示用の軽量データのみ取得
+          period: period, // 期間フィルター
+        });
+
+        const res = await fetch(`${API_BASE}/events/bounds?${params}`, {
+          signal: abortController.signal,
+        });
+        if (!res.ok) {
+          throw new Error("Failed to fetch events");
+        }
+        const data = await res.json();
+
         // コンポーネントがまだマウントされている場合のみ状態更新
         if (!abortController.signal.aborted) {
-          setEvents([]);
+          setEvents(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Error fetching events:", err);
+          // コンポーネントがまだマウントされている場合のみ状態更新
+          if (!abortController.signal.aborted) {
+            setEvents([]);
+          }
+        }
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsLoading(false);
         }
       }
-    } finally {
-      if (!abortController.signal.aborted) {
-        setIsLoading(false);
-      }
-    }
-  }, [eventPeriod]);
+    },
+    [eventPeriod]
+  );
 
   const fetchEventDetails = async (eventId) => {
     setIsLoadingEventDetails(true);
@@ -344,23 +349,32 @@ const MyComponent = () => {
                 <div className="flex items-center space-x-2">
                   <div className="flex space-x-1 flex-shrink-0">
                     <button
-                      onClick={selectedCategories.size === 0 ? showAllCategories : hideAllCategories}
+                      onClick={
+                        selectedCategories.size === 0
+                          ? showAllCategories
+                          : hideAllCategories
+                      }
                       className="px-3 py-1 text-xs font-medium rounded-full transition-all whitespace-nowrap text-white shadow-lg"
                       style={{
-                        backgroundColor: selectedCategories.size === 0 ? "#3B82F6" : "#6B7280",
+                        backgroundColor:
+                          selectedCategories.size === 0 ? "#3B82F6" : "#6B7280",
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = selectedCategories.size === 0 ? "#2563EB" : "#4B5563";
+                        e.target.style.backgroundColor =
+                          selectedCategories.size === 0 ? "#2563EB" : "#4B5563";
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = selectedCategories.size === 0 ? "#3B82F6" : "#6B7280";
+                        e.target.style.backgroundColor =
+                          selectedCategories.size === 0 ? "#3B82F6" : "#6B7280";
                       }}
                     >
-                      {selectedCategories.size === 0 ? "すべて表示" : "すべて非表示"}
+                      {selectedCategories.size === 0
+                        ? "すべて表示"
+                        : "すべて非表示"}
                     </button>
                   </div>
                   <div className="flex space-x-1">
-                    {[1, 2, 3, 4, 5, 6, 7, 0].map(categoryId => (
+                    {[1, 2, 3, 4, 5, 6, 7, 0].map((categoryId) => (
                       <button
                         key={categoryId}
                         onClick={() => toggleCategory(categoryId)}
@@ -370,7 +384,9 @@ const MyComponent = () => {
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                         style={{
-                          backgroundColor: selectedCategories.has(categoryId) ? "#3B82F6" : undefined,
+                          backgroundColor: selectedCategories.has(categoryId)
+                            ? "#3B82F6"
+                            : undefined,
                         }}
                       >
                         <img
@@ -446,110 +462,109 @@ const MyComponent = () => {
 
           {/* スマホ用フィルター（期間とカテゴリ） */}
           <div className="py-1 px-1 pb-2">
-            <div className="flex justify-center">
-              <div className="flex items-center space-x-2 overflow-x-auto max-w-full">
-                {/* 期間フィルター */}
-                <div className="flex space-x-0.5 flex-shrink-0">
-                  <button
-                    onClick={() => setEventPeriod("today")}
-                    className={`font-medium rounded text-center transition-colors whitespace-nowrap ${
-                      eventPeriod === "today"
-                        ? "text-white"
-                        : "text-gray-700"
-                    }`}
-                    style={{
-                      backgroundColor:
-                        eventPeriod === "today" ? "#3B82F6" : "#F3F4F6",
-                      fontSize: "8px",
-                      padding: "2px 6px",
-                    }}
-                  >
-                    今日
-                  </button>
-                  <button
-                    onClick={() => setEventPeriod("weekend")}
-                    className={`font-medium rounded text-center transition-colors whitespace-nowrap ${
-                      eventPeriod === "weekend"
-                        ? "text-white"
-                        : "text-gray-700"
-                    }`}
-                    style={{
-                      backgroundColor:
-                        eventPeriod === "weekend" ? "#3B82F6" : "#F3F4F6",
-                      fontSize: "8px",
-                      padding: "2px 6px",
-                    }}
-                  >
-                    今週末
-                  </button>
-                  <button
-                    onClick={() => setEventPeriod("all")}
-                    className={`font-medium rounded text-center transition-colors whitespace-nowrap ${
-                      eventPeriod === "all"
-                        ? "text-white"
-                        : "text-gray-700"
-                    }`}
-                    style={{
-                      backgroundColor:
-                        eventPeriod === "all" ? "#3B82F6" : "#F3F4F6",
-                      fontSize: "8px",
-                      padding: "2px 6px",
-                    }}
-                  >
-                    今月
-                  </button>
-                </div>
+            {/* 期間フィルター */}
+            <div className="flex justify-center mb-1">
+              <div className="flex space-x-0.5">
+                <button
+                  onClick={() => setEventPeriod("today")}
+                  className={`font-medium rounded text-center transition-colors whitespace-nowrap ${
+                    eventPeriod === "today" ? "text-white" : "text-gray-700"
+                  }`}
+                  style={{
+                    backgroundColor:
+                      eventPeriod === "today" ? "#3B82F6" : "#F3F4F6",
+                    fontSize: "8px",
+                    padding: "2px 6px",
+                  }}
+                >
+                  今日
+                </button>
+                <button
+                  onClick={() => setEventPeriod("weekend")}
+                  className={`font-medium rounded text-center transition-colors whitespace-nowrap ${
+                    eventPeriod === "weekend" ? "text-white" : "text-gray-700"
+                  }`}
+                  style={{
+                    backgroundColor:
+                      eventPeriod === "weekend" ? "#3B82F6" : "#F3F4F6",
+                    fontSize: "8px",
+                    padding: "2px 6px",
+                  }}
+                >
+                  今週末
+                </button>
+                <button
+                  onClick={() => setEventPeriod("all")}
+                  className={`font-medium rounded text-center transition-colors whitespace-nowrap ${
+                    eventPeriod === "all" ? "text-white" : "text-gray-700"
+                  }`}
+                  style={{
+                    backgroundColor:
+                      eventPeriod === "all" ? "#3B82F6" : "#F3F4F6",
+                    fontSize: "8px",
+                    padding: "2px 6px",
+                  }}
+                >
+                  今月
+                </button>
+              </div>
+            </div>
 
-                {/* 区切り線 */}
-                <div className="h-4 w-px bg-gray-300 flex-shrink-0"></div>
-
-                {/* カテゴリフィルター */}
-                <div className="flex items-center space-x-1">
-                  <div className="flex-shrink-0">
-                    <button
-                      onClick={selectedCategories.size === 0 ? showAllCategories : hideAllCategories}
-                      className="rounded-full transition-all whitespace-nowrap text-white shadow-sm"
-                      style={{
-                        backgroundColor: selectedCategories.size === 0 ? "#3B82F6" : "#6B7280",
-                        fontSize: "7px",
-                        padding: "2px 6px",
-                      }}
-                      onTouchStart={(e) => {
-                        e.target.style.backgroundColor = selectedCategories.size === 0 ? "#2563EB" : "#4B5563";
-                      }}
-                      onTouchEnd={(e) => {
-                        e.target.style.backgroundColor = selectedCategories.size === 0 ? "#3B82F6" : "#6B7280";
-                      }}
-                    >
-                      {selectedCategories.size === 0 ? "すべて表示" : "すべて非表示"}
-                    </button>
-                  </div>
-                  <div className="flex space-x-0.5">
-                    {[1, 2, 3, 4, 5, 6, 7, 0].map(categoryId => (
-                      <button
-                        key={categoryId}
-                        onClick={() => toggleCategory(categoryId)}
-                        className={`flex items-center space-x-0.5 rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
-                          selectedCategories.has(categoryId)
-                            ? "text-white shadow-sm"
-                            : "text-gray-600"
-                        }`}
-                        style={{
-                          backgroundColor: selectedCategories.has(categoryId) ? "#3B82F6" : "#F3F4F6",
-                          fontSize: "7px",
-                          padding: "1px 3px",
-                        }}
-                      >
-                        <img
-                          src={iconMap[categoryId].img}
-                          alt={categoryNames[categoryId]}
-                          className="w-2 h-2"
-                        />
-                        <span>{categoryNames[categoryId]}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+            {/* カテゴリフィルター */}
+            <div className="px-1">
+              <div className="flex flex-wrap justify-center items-center gap-1">
+                <button
+                  onClick={
+                    selectedCategories.size === 0
+                      ? showAllCategories
+                      : hideAllCategories
+                  }
+                  className="flex items-center rounded-full transition-all whitespace-nowrap text-white shadow-sm"
+                  style={{
+                    backgroundColor:
+                      selectedCategories.size === 0 ? "#3B82F6" : "#6B7280",
+                    fontSize: "7px",
+                    padding: "1px 3px",
+                    minHeight: "12px",
+                  }}
+                  onTouchStart={(e) => {
+                    e.target.style.backgroundColor =
+                      selectedCategories.size === 0 ? "#2563EB" : "#4B5563";
+                  }}
+                  onTouchEnd={(e) => {
+                    e.target.style.backgroundColor =
+                      selectedCategories.size === 0 ? "#3B82F6" : "#6B7280";
+                  }}
+                >
+                  {selectedCategories.size === 0
+                    ? "すべて表示"
+                    : "すべて非表示"}
+                </button>
+                {[1, 2, 3, 4, 5, 6, 7, 0].map((categoryId) => (
+                  <button
+                    key={categoryId}
+                    onClick={() => toggleCategory(categoryId)}
+                    className={`flex items-center space-x-0.5 rounded-full transition-all whitespace-nowrap ${
+                      selectedCategories.has(categoryId)
+                        ? "text-white shadow-sm"
+                        : "text-gray-600"
+                    }`}
+                    style={{
+                      backgroundColor: selectedCategories.has(categoryId)
+                        ? "#3B82F6"
+                        : "#F3F4F6",
+                      fontSize: "7px",
+                      padding: "1px 3px",
+                    }}
+                  >
+                    <img
+                      src={iconMap[categoryId].img}
+                      alt={categoryNames[categoryId]}
+                      className="w-2 h-2"
+                    />
+                    <span>{categoryNames[categoryId]}</span>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -640,27 +655,29 @@ const MyComponent = () => {
               title="現在地"
             />
           )}
-          {events && Array.isArray(events) && events
-            .filter(event => selectedCategories.has(event.icon_category))
-            .map((event) => (
-              <Marker
-                key={event.id}
-                position={{ lat: event.lat, lng: event.lng }}
-                onClick={async () => {
-                  const eventDetails = await fetchEventDetails(event.id);
-                  if (eventDetails) {
-                    setSelectedEvent(eventDetails);
-                  }
-                }}
-                icon={{
-                  url: iconMap[event.icon_category]["img"],
-                  scaledSize: new window.google.maps.Size(
-                    iconMap[event.icon_category]["size"],
-                    iconMap[event.icon_category]["size"]
-                  ),
-                }}
-              />
-            ))}
+          {events &&
+            Array.isArray(events) &&
+            events
+              .filter((event) => selectedCategories.has(event.icon_category))
+              .map((event) => (
+                <Marker
+                  key={event.id}
+                  position={{ lat: event.lat, lng: event.lng }}
+                  onClick={async () => {
+                    const eventDetails = await fetchEventDetails(event.id);
+                    if (eventDetails) {
+                      setSelectedEvent(eventDetails);
+                    }
+                  }}
+                  icon={{
+                    url: iconMap[event.icon_category]["img"],
+                    scaledSize: new window.google.maps.Size(
+                      iconMap[event.icon_category]["size"],
+                      iconMap[event.icon_category]["size"]
+                    ),
+                  }}
+                />
+              ))}
         </GoogleMap>
       </div>
 
