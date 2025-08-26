@@ -4,7 +4,7 @@ import {
   Marker,
   InfoWindow,
 } from "@react-google-maps/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
 import Sidebar from "./Sidebar.jsx";
@@ -37,6 +37,7 @@ const MyComponent = () => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [eventPeriod, setEventPeriod] = useState("today"); // "today", "weekend", "all"
   const [currentAbortController, setCurrentAbortController] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState(new Set([0, 1, 2, 3, 4, 5, 6, 7])); // すべてのカテゴリを初期選択
 
   const iconMap = {
     0: { img: "/other.png", size: 30 },
@@ -50,13 +51,47 @@ const MyComponent = () => {
     8: { img: "/other.png", size: 30 },
   };
 
-  const fetchEventsInBounds = async (bounds, period = eventPeriod) => {
+  const categoryNames = {
+    0: "その他",
+    1: "花火",
+    2: "祭り", 
+    3: "グルメ",
+    4: "アート",
+    5: "ゲーム",
+    6: "アクティビティ",
+    7: "音楽"
+  };
+
+  const toggleCategory = (categoryId) => {
+    setSelectedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
+  };
+
+  const hideAllCategories = () => {
+    setSelectedCategories(new Set());
+  };
+
+  const showAllCategories = () => {
+    setSelectedCategories(new Set([0, 1, 2, 3, 4, 5, 6, 7]));
+  };
+
+  const fetchEventsInBounds = useCallback(async (bounds, period = eventPeriod) => {
     if (!bounds) return;
 
     // 前のリクエストをキャンセル
-    if (currentAbortController) {
-      currentAbortController.abort();
-    }
+    setCurrentAbortController(prev => {
+      if (prev) {
+        prev.abort();
+      }
+      return null;
+    });
 
     const abortController = new AbortController();
     setCurrentAbortController(abortController);
@@ -100,7 +135,7 @@ const MyComponent = () => {
         setIsLoading(false);
       }
     }
-  };
+  }, [eventPeriod]);
 
   const fetchEventDetails = async (eventId) => {
     setIsLoadingEventDetails(true);
@@ -124,7 +159,7 @@ const MyComponent = () => {
       const bounds = map.getBounds();
       fetchEventsInBounds(bounds);
     }
-  }, [map]);
+  }, [map, fetchEventsInBounds]);
 
   // 期間フィルターが変更された時にイベントを再取得
   useEffect(() => {
@@ -132,7 +167,7 @@ const MyComponent = () => {
       const bounds = map.getBounds();
       fetchEventsInBounds(bounds, eventPeriod);
     }
-  }, [eventPeriod]);
+  }, [eventPeriod, map, fetchEventsInBounds]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -299,6 +334,54 @@ const MyComponent = () => {
               </button>
             </div>
           </div>
+
+          {/* PC用カテゴリフィルター */}
+          <div className="border-t border-gray-200 py-2 px-4">
+            <div className="flex justify-center">
+              <div className="flex items-center space-x-2 overflow-x-auto max-w-full">
+                <div className="flex space-x-1 flex-shrink-0">
+                  <button
+                    onClick={selectedCategories.size === 0 ? showAllCategories : hideAllCategories}
+                    className="px-3 py-1 text-xs font-medium rounded-full transition-all whitespace-nowrap text-white shadow-lg"
+                    style={{
+                      backgroundColor: selectedCategories.size === 0 ? "#10B981" : "#EF4444",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = selectedCategories.size === 0 ? "#059669" : "#DC2626";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = selectedCategories.size === 0 ? "#10B981" : "#EF4444";
+                    }}
+                  >
+                    {selectedCategories.size === 0 ? "すべて表示" : "すべて非表示"}
+                  </button>
+                </div>
+                <div className="flex space-x-1">
+                  {[0, 1, 2, 3, 4, 5, 6, 7].map(categoryId => (
+                    <button
+                      key={categoryId}
+                      onClick={() => toggleCategory(categoryId)}
+                      className={`flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
+                        selectedCategories.has(categoryId)
+                          ? "text-white shadow-lg"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                      style={{
+                        backgroundColor: selectedCategories.has(categoryId) ? "#3B82F6" : undefined,
+                      }}
+                    >
+                      <img
+                        src={iconMap[categoryId].img}
+                        alt={categoryNames[categoryId]}
+                        className="w-4 h-4"
+                      />
+                      <span>{categoryNames[categoryId]}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* スマホ用ヘッダー */}
@@ -407,6 +490,58 @@ const MyComponent = () => {
               </button>
             </div>
           </div>
+
+          {/* スマホ用カテゴリフィルター */}
+          <div className="border-t border-gray-200 py-1 px-1">
+            <div className="flex justify-center">
+              <div className="flex items-center space-x-1 overflow-x-auto max-w-full">
+                <div className="flex-shrink-0">
+                  <button
+                    onClick={selectedCategories.size === 0 ? showAllCategories : hideAllCategories}
+                    className="rounded-full transition-all whitespace-nowrap text-white shadow-sm"
+                    style={{
+                      backgroundColor: selectedCategories.size === 0 ? "#10B981" : "#EF4444",
+                      fontSize: "7px",
+                      padding: "2px 6px",
+                    }}
+                    onTouchStart={(e) => {
+                      e.target.style.backgroundColor = selectedCategories.size === 0 ? "#059669" : "#DC2626";
+                    }}
+                    onTouchEnd={(e) => {
+                      e.target.style.backgroundColor = selectedCategories.size === 0 ? "#10B981" : "#EF4444";
+                    }}
+                  >
+                    {selectedCategories.size === 0 ? "すべて表示" : "すべて非表示"}
+                  </button>
+                </div>
+                <div className="flex space-x-1">
+                  {[0, 1, 2, 3, 4, 5, 6, 7].map(categoryId => (
+                    <button
+                      key={categoryId}
+                      onClick={() => toggleCategory(categoryId)}
+                      className={`flex items-center space-x-0.5 rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
+                        selectedCategories.has(categoryId)
+                          ? "text-white shadow-sm"
+                          : "text-gray-600"
+                      }`}
+                      style={{
+                        backgroundColor: selectedCategories.has(categoryId) ? "#3B82F6" : "#F3F4F6",
+                        fontSize: "8px",
+                        padding: "2px 4px",
+                      }}
+                    >
+                      <img
+                        src={iconMap[categoryId].img}
+                        alt={categoryNames[categoryId]}
+                        className="w-2.5 h-2.5"
+                      />
+                      <span>{categoryNames[categoryId]}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -438,7 +573,7 @@ const MyComponent = () => {
       )}
 
       {(isLoading || isLoadingEventDetails) && (
-        <div className="absolute top-[80px] md:top-[100px] left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-lg z-20">
+        <div className="absolute top-[120px] md:top-[150px] left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-lg z-20">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
             <span className="text-sm text-gray-600">
@@ -450,7 +585,7 @@ const MyComponent = () => {
         </div>
       )}
 
-      <div className="flex pt-[80px] md:pt-[120px] h-full">
+      <div className="flex pt-[120px] md:pt-[180px] h-full">
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={mapCenter}
@@ -494,25 +629,27 @@ const MyComponent = () => {
               title="現在地"
             />
           )}
-          {events && Array.isArray(events) && events.map((event) => (
-            <Marker
-              key={event.id}
-              position={{ lat: event.lat, lng: event.lng }}
-              onClick={async () => {
-                const eventDetails = await fetchEventDetails(event.id);
-                if (eventDetails) {
-                  setSelectedEvent(eventDetails);
-                }
-              }}
-              icon={{
-                url: iconMap[event.icon_category]["img"],
-                scaledSize: new window.google.maps.Size(
-                  iconMap[event.icon_category]["size"],
-                  iconMap[event.icon_category]["size"]
-                ),
-              }}
-            />
-          ))}
+          {events && Array.isArray(events) && events
+            .filter(event => selectedCategories.has(event.icon_category))
+            .map((event) => (
+              <Marker
+                key={event.id}
+                position={{ lat: event.lat, lng: event.lng }}
+                onClick={async () => {
+                  const eventDetails = await fetchEventDetails(event.id);
+                  if (eventDetails) {
+                    setSelectedEvent(eventDetails);
+                  }
+                }}
+                icon={{
+                  url: iconMap[event.icon_category]["img"],
+                  scaledSize: new window.google.maps.Size(
+                    iconMap[event.icon_category]["size"],
+                    iconMap[event.icon_category]["size"]
+                  ),
+                }}
+              />
+            ))}
         </GoogleMap>
       </div>
 
